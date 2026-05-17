@@ -1,18 +1,17 @@
 [project]
-name = "fake-useragent"
+name = "forge-useragent"
 version = "3.0.0"
 license = "Apache-2.0"
 description = "Up-to-date simple user-agent faker with real world database"
 readme = "README.md"
 keywords = [
   "agent",
-  "fake",
-  "fake user agent",
-  "fake useragent",
-  "user",
-  "user agent",
+  "user-agent",
   "useragent",
   "forge",
+  "fake",
+  "forge-useragent",
+  "fake-useragent",
 ]
 authors = [
   { name = "Melroy van den Berg", email = "melroy@melroy.org" },
@@ -63,6 +62,9 @@ dev = [
 target-version = "py310"
 line-length = 142
 
+[tool.uv.build-backend]
+module-name = "fake_useragent"
+
 lint.select = [
   "B",
   "C4",
@@ -85,10 +87,10 @@ lint.ignore = [
   "SIM105",
   "SIM108",
 ]
-lint.per-file-ignores."docs/**/*" = [ "D" ]
-lint.per-file-ignores."src/fake_useragent/__init__.py" = [ "F401" ]
-lint.per-file-ignores."tests/**/*" = [ "D", "S", "SIM", "UP015" ]
-lint.isort.known-first-party = [ "fake_useragent" ]
+lint.per-file-ignores."docs/**/*" = ["D"]
+lint.per-file-ignores."src/fake_useragent/__init__.py" = ["F401"]
+lint.per-file-ignores."tests/**/*" = ["D", "S", "SIM", "UP015"]
+lint.isort.known-first-party = ["fake_useragent"]
 lint.mccabe.max-complexity = 13
 lint.pydocstyle.convention = "google"
 lint.pylint.max-args = 7

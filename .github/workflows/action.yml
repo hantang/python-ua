@@ -1,11 +1,13 @@
-name: Test fake-useragent
+name: Test Packages
 
 on:
   push:
     branches:
       - main
-    tags:
-      - "*"
+    # tags:
+    #   - "*"
+    paths:
+      - "**/*.py"
   pull_request:
     branches:
       - main
