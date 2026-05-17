@@ -42,7 +42,8 @@ wheels/
 .venv
 
 # uv
-uv.lock
+.uv-cache/
+.uv-tools/
 
 # macos
 .DS_Store

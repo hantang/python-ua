@@ -19,15 +19,15 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
-        python-version: '3.x'
-        cache: 'pip'
-        cache-dependency-path: requirements_converter.txt
+        python-version: '3.13'
 
-    - name: Install dependencies
-      run: pip install -r requirements_converter.txt
+    - name: Install uv
+      uses: astral-sh/setup-uv@v8.1.0
+      with:
+        enable-cache: true
 
     - name: Process source UA file and produce our JSONL
-      run: python ua-converter/ua_convert.py --download
+      run: uv run --group converter python ua-converter/ua_convert.py --download
 
     - name: Create Pull Request
       id: pr
@@ -37,5 +37,7 @@ jobs:
         branch: automated/ua-update
         title: Update bundled user agents file
         body: |
-          This PR updates the bundled user agents file. Thanks Intoli for the licence that permits us to use their data! Check their work at [`user-agents`](https://github.com/intoli/user-agents).
+          This PR updates the bundled user agents file. 
+          Thanks Intoli for the licence that permits us to use their data! 
+          Check their work at [`user-agents`](https://github.com/intoli/user-agents).
         labels: ua-file

@@ -18,7 +18,7 @@ authors = [
   { name = "Victor Kovtun", email = "hellysmile@gmail.com" },
   { name = "hantang" },
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
@@ -28,35 +28,38 @@ classifiers = [
   "Operating System :: POSIX",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Internet :: WWW/HTTP",
   "Topic :: Software Development",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Topic :: Utilities",
 ]
 
-# dependencies = [ "importlib-resources>=6; python_version<'3.10'" ]
-# urls.Homepage = "https://github.com/fake-useragent/fake-useragent"
-
 [build-system]
 requires = ["uv_build>=0.11.12,<0.12.0"]
 build-backend = "uv_build"
 
-# [build-system]
-# build-backend = "setuptools.build_meta"
-# requires = [ "setuptools>=77.0" ]
-# [tool.setuptools]
-# zip-safe = false
-# [tool.setuptools.package-data]
-# "fake_useragent.data" = [ "*.jsonl" ]
-# "fake_useragent" = [ "py.typed" ]
+[dependency-groups]
+converter = [
+  "requests>=2.32.4",
+  "ua-parser>=1.0.0",
+  "ua-parser-builtins>=0.18.0.post1",
+  "ua-parser-rs>=0.1.2",
+]
+dev = [
+  "mypy>=1.18.2",
+  "pytest>=8.3.5",
+  "pytest-cov>=6.0.0",
+  "ruff>=0.11.13",
+  "validate-pyproject>=0.24.1",
+]
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py310"
 line-length = 142
 
 lint.select = [
@@ -64,7 +67,6 @@ lint.select = [
   "C4",
   "C9",
   "D",   # Check compliance with Python docstring conventions.
-  "DOC", # Ensure docstrings are consistent with signatures.
   "E",
   "F",
   "I",
@@ -82,9 +84,9 @@ lint.ignore = [
   "SIM105",
   "SIM108",
 ]
-lint.per-file-ignores."docs/**/*" = [ "D", "DOC" ]
+lint.per-file-ignores."docs/**/*" = [ "D" ]
 lint.per-file-ignores."src/fake_useragent/__init__.py" = [ "F401" ]
-lint.per-file-ignores."tests/**/*" = [ "D", "DOC", "S", "SIM", "UP015" ]
+lint.per-file-ignores."tests/**/*" = [ "D", "S", "SIM", "UP015" ]
 lint.isort.known-first-party = [ "fake_useragent" ]
 lint.mccabe.max-complexity = 13
 lint.pydocstyle.convention = "google"

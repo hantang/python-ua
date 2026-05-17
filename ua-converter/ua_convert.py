@@ -3,6 +3,7 @@
 # Author: Melroy van den Berg
 
 """Description: Convert the user-agents.json file to JSONlines and directly remaps the keys."""
+
 import argparse
 import gzip
 import json
@@ -17,9 +18,7 @@ from ua_parser import parse
 
 from fake_useragent.utils import BrowserUserAgentData, find_browser_json_path
 
-DEFAULT_URL = (
-    "https://raw.githubusercontent.com/intoli/user-agents/main/src/user-agents.json.gz"
-)
+DEFAULT_URL = "https://raw.githubusercontent.com/intoli/user-agents/main/src/user-agents.json.gz"
 
 
 class SourceItem(TypedDict):
@@ -150,13 +149,9 @@ def convert_useragents_formats(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Convert Intoli's user agent data to our JSONL format."
-    )
+    parser = argparse.ArgumentParser(description="Convert Intoli's user agent data to our JSONL format.")
 
-    input_group = parser.add_argument_group(
-        "Input source", "Define where to get the source data from."
-    )
+    input_group = parser.add_argument_group("Input source", "Define where to get the source data from.")
     exclusive_group = input_group.add_mutually_exclusive_group(required=True)
     exclusive_group.add_argument(
         "-i",
@@ -169,10 +164,7 @@ if __name__ == "__main__":
     exclusive_group.add_argument(
         "-d",
         "--download",
-        help=(
-            "Download source file from URL. Supports gzipped and non-gzipped files "
-            "(default: %(const)s)"
-        ),
+        help=("Download source file from URL. Supports gzipped and non-gzipped files (default: %(const)s)"),
         nargs="?",
         const=DEFAULT_URL,
         type=str,
