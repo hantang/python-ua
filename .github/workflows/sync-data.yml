@@ -27,7 +27,7 @@ jobs:
         enable-cache: true
 
     - name: Process source UA file and produce our JSONL
-      run: uv run --group converter python ua-converter/ua_convert.py --download
+      run: uv run --group converter python scripts/ua_convert.py --download
 
     - name: Create Pull Request
       id: pr

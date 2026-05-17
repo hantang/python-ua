@@ -45,7 +45,7 @@ def download_and_extract(source_url: str) -> list[SourceItem]:
             returned elements have more keys than the `SourceItem` schema, but we only use the
             keys defined in the schema.
     """
-    response = requests.get(source_url, timeout=10)
+    response = requests.get(source_url, timeout=30)
     response.raise_for_status()
 
     if source_url.endswith(".gz"):
@@ -193,7 +193,7 @@ if __name__ == "__main__":
         data = download_and_extract(args.download)
     else:
         print(f"Reading data from {args.input}")
-        with open(args.input, "r") as f:
+        with open(args.input, "r", encoding="utf-8") as f:
             data = json.load(f)
 
     if args.parse_limit:
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     jsonl_converted = convert_useragents_formats(data)
 
     print(f"Writing data to {args.output}")
-    with open(args.output, "w") as f:
-        for item in jsonl_converted:
-            f.write(json.dumps(item) + "\n")
+    with open(args.output, "w", encoding="utf-8") as f:
+        for entry in jsonl_converted:
+            f.write(json.dumps(entry) + "\n")
     print("Done!")

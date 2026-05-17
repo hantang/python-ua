@@ -37,16 +37,16 @@ jobs:
       - name: Install dependencies
         run: uv sync --python python
       - name: Ruff format check
-        run: uv run --python python ruff format --check src
+        run: uvx ruff format --check src
       - name: Ruff lint
-        run: uv run --python python ruff check src
+        run: uvx ruff check src
       - name: Type check
-        run: uv run --python python mypy src
+        run: uvx mypy src
 
       - name: Validate package metadata
-        run: uv run --python python validate-pyproject pyproject.toml
+        run: uvx validate-pyproject pyproject.toml
       - name: Run tests
-        run: uv run --python python pytest
+        run: uv run pytest 
       - name: Upload code coverage (HTML)
         uses: actions/upload-artifact@v7
         with:

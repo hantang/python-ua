@@ -1,6 +1,6 @@
 [project]
 name = "fake-useragent"
-version = "2.2.0"
+version = "3.0.0"
 license = "Apache-2.0"
 description = "Up-to-date simple user-agent faker with real world database"
 readme = "README.md"

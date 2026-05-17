@@ -200,7 +200,7 @@ class FakeUserAgent:
                 # And convert the iterator back to a list
                 filtered_browsers = self._filter_useragents()
             else:
-                # Or when random isn't select, we filter the browsers array based on the 'request' using lamba
+                # Or when random isn't select, we filter the browsers array based on the 'request' using lambda
                 # And based on OS list
                 # And percentage is bigger then min percentage
                 # And convert the iterator back to a list
