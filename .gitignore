@@ -18,7 +18,6 @@ dist
 *.sublime-workspace
 *.sqlite
 *.db
-__pycache__
 *.bak
 *.swp
 *.swo
@@ -31,3 +30,26 @@ ua-converter/browsers.jsonl
 
 # Personal workspace
 .personal_workspace
+
+# Python-generated files
+__pycache__
+*.py[oc]
+build/
+dist/
+wheels/
+
+# Virtual environments
+.venv
+
+# uv
+uv.lock
+
+# macos
+.DS_Store
+
+# ide
+.vscode/
+.idea/
+
+# more
+todo/
