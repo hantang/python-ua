@@ -1,16 +1,9 @@
 """General utils for the fake_useragent package."""
 
+import importlib.resources as ilr
 import json
-import sys
-from typing import TypedDict, Union
-
-# We need files() from Python 3.10 or higher
-if sys.version_info >= (3, 10):
-    import importlib.resources as ilr
-else:
-    import importlib_resources as ilr  # noqa: F401
-
 from pathlib import Path
+from typing import TypedDict, Union
 
 from fake_useragent.errors import FakeUserAgentError
 from fake_useragent.log import logger
@@ -55,7 +48,7 @@ def find_browser_json_path() -> Path:
         return Path(str(file_path))
     except Exception as exc:
         logger.warning(
-            "Unable to find local data/jsonl file using importlib-resources.",
+            "Unable to find local data/jsonl file using importlib.resources.",
             exc_info=exc,
         )
         raise FakeUserAgentError("Could not locate browsers.jsonl file") from exc

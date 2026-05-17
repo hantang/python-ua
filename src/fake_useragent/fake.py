@@ -8,9 +8,7 @@ from fake_useragent.log import logger
 from fake_useragent.utils import BrowserUserAgentData, load
 
 
-def _ensure_iterable(
-    *, default: Iterable[str], **kwarg: Optional[Iterable[str]]
-) -> list[str]:
+def _ensure_iterable(*, default: Iterable[str], **kwarg: Optional[Iterable[str]]) -> list[str]:
     """Ensure the given value is an Iterable and convert it to a list.
 
     Args:
@@ -26,9 +24,7 @@ def _ensure_iterable(
         list[str]: A list containing the items from the iterable.
     """
     if len(kwarg) != 1:
-        raise ValueError(
-            f"ensure_iterable expects exactly one keyword argument but got {len(kwarg)}."
-        )
+        raise ValueError(f"ensure_iterable expects exactly one keyword argument but got {len(kwarg)}.")
 
     param_name, value = next(iter(kwarg.items()))
 
@@ -40,10 +36,7 @@ def _ensure_iterable(
     try:
         return list(value)
     except TypeError as te:
-        raise TypeError(
-            f"'{param_name}' must be an iterable of str, a single str, or None but got "
-            f"{type(value).__name__}."
-        ) from te
+        raise TypeError(f"'{param_name}' must be an iterable of str, a single str, or None but got {type(value).__name__}.") from te
 
 
 def _ensure_float(value: Any) -> float:
@@ -122,9 +115,7 @@ class FakeUserAgent:
         min_percentage: float = 0.0,
         platforms: Optional[Iterable[str]] = None,
         fallback: str = (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0"
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0"
         ),
         safe_attrs: Optional[Iterable[str]] = None,
     ):
@@ -172,9 +163,7 @@ class FakeUserAgent:
         self.min_percentage = _ensure_float(min_percentage)
         self.min_version = _ensure_float(min_version)
 
-        self.platforms = _ensure_iterable(
-            platforms=platforms, default=["desktop", "mobile", "tablet"]
-        )
+        self.platforms = _ensure_iterable(platforms=platforms, default=["desktop", "mobile", "tablet"])
 
         if not isinstance(fallback, str):
             msg = f"fallback must be a str but got {type(fallback).__name__}."
@@ -186,9 +175,7 @@ class FakeUserAgent:
         safe_attrs = _ensure_iterable(safe_attrs=safe_attrs, default=set())
         str_safe_attrs = [isinstance(attr, str) for attr in safe_attrs]
         if not all(str_safe_attrs):
-            bad_indices = [
-                idx for idx, is_str in enumerate(str_safe_attrs) if not is_str
-            ]
+            bad_indices = [idx for idx, is_str in enumerate(str_safe_attrs) if not is_str]
             msg = f"safe_attrs must be an iterable of str but indices {bad_indices} are not."
             raise TypeError(msg)
         self.safe_attrs = set(safe_attrs)
@@ -224,8 +211,7 @@ class FakeUserAgent:
             return random.choice(filtered_browsers)  # noqa: S311
         except (KeyError, IndexError):
             logger.warning(
-                f"Error occurred during getting browser(s): {browsers}, "
-                "but was suppressed with fallback.",
+                f"Error occurred during getting browser(s): {browsers}, but was suppressed with fallback.",
             )
             # Return fallback object
             return {
@@ -241,9 +227,7 @@ class FakeUserAgent:
                 "platform": "Win32",
             }
 
-    def _filter_useragents(
-        self, browsers_to_filter: Optional[Union[str, list[str]]] = None
-    ) -> list[BrowserUserAgentData]:
+    def _filter_useragents(self, browsers_to_filter: Optional[Union[str, list[str]]] = None) -> list[BrowserUserAgentData]:
         """Filter the user agents based on filters set in the instance, and an optional browser name.
 
         User agents from the data file are filtered based on the attributes passed upon
@@ -260,12 +244,13 @@ class FakeUserAgent:
 
         filtered_useragents = list(
             filter(
-                lambda x: x["browser"] in self.browsers
-                and x["os"] in self.os
-                and x["type"]
-                in self.platforms  # We check platform on type here (I know it's confusing)
-                and x["browser_version_major_minor"] >= self.min_version
-                and x["percent"] >= self.min_percentage,
+                lambda x: (
+                    x["browser"] in self.browsers
+                    and x["os"] in self.os
+                    and x["type"] in self.platforms  # We check platform on type here (I know it's confusing)
+                    and x["browser_version_major_minor"] >= self.min_version
+                    and x["percent"] >= self.min_percentage
+                ),
                 self.data_browsers,
             )
         )
@@ -276,11 +261,7 @@ class FakeUserAgent:
             if isinstance(browsers_to_filter, str):
                 browsers_to_filter = [browsers_to_filter]
 
-            filtered_useragents = list(
-                filter(
-                    lambda x: x["browser"] in browsers_to_filter, filtered_useragents
-                )
-            )
+            filtered_useragents = list(filter(lambda x: x["browser"] in browsers_to_filter, filtered_useragents))
 
         return filtered_useragents
 
