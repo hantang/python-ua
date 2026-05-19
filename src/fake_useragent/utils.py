@@ -88,7 +88,7 @@ def find_browser_json_path() -> Path:
     """
     try:
         # file_path = ilr.files(PACKAGE_DATA_PATH).joinpath(BROWSER_DATA_FILENAME)
-        file_path = resources.files(__package__).joinpath(BROWSER_DATA_PATH, BROWSER_DATA_FILENAME)
+        file_path = resources.files(__package__) / BROWSER_DATA_PATH / BROWSER_DATA_FILENAME
         return Path(str(file_path))
     except Exception as exc:
         logger.warning("Unable to find local data/jsonl file using importlib.resources.", exc_info=exc)
