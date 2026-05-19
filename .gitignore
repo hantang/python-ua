@@ -55,7 +55,7 @@ wheels/
 # more
 todo/
 backup/
-temp/
+temp*/
 
 log/
 .claude/
