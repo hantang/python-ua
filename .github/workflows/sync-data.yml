@@ -1,4 +1,4 @@
-name: Update Bundled User Agents
+name: Update browsers.jsonl
 
 on:
   schedule:
@@ -47,26 +47,27 @@ jobs:
       - name: Validate generated user-agent dataset
         run: uv run python scripts/validate_dataset.py
 
-      # - name: Create Pull Request
-      #   id: pr
-      #   uses: peter-evans/create-pull-request@v8
-      #   with:
-      #     commit-message: Update bundled user agents
-      #     branch: automated/ua-update
-      #     title: Update bundled user agents file
-      #     body: |
-      #       This PR updates the bundled user agents file. 
-      #       Thanks Intoli for the licence that permits us to use their data! 
-      #       Check their work at [`user-agents`](https://github.com/intoli/user-agents).
-      #     labels: ua-file
-
-      - name: Git auto commit
-        uses: stefanzweifel/git-auto-commit-action@v7
+      - name: Create Pull Request
+        id: pr
+        if: steps.git-check.outputs.no_changes == 'false'
+        uses: peter-evans/create-pull-request@v8
         with:
-          commit_user_name: "github-actions[bot]"
-          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
-          commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
-          commit_message: Automated update browsers.jsonl
-          # commit_options: '--no-verify --signoff'
-          # push_options: "--force"
-          file_pattern: "*.jsonl"
+          commit-message: "[Bot] Update browsers.jsonl"
+          title: Update browsers.jsonl file
+          body: |
+            This PR updates the browsers.jsonl file. 
+            Data from [intoli/user-agents](https://github.com/intoli/user-agents).
+          labels: ua-file
+          branch: bot/data-update
+          delete-branch: true
+
+      # - name: Git auto commit
+      #   uses: stefanzweifel/git-auto-commit-action@v7
+      #   with:
+      #     commit_user_name: "github-actions[bot]"
+      #     commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+      #     commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+      #     commit_message: Automated update browsers.jsonl
+      #     # commit_options: '--no-verify --signoff'
+      #     # push_options: "--force"
+      #     file_pattern: "*.jsonl"
