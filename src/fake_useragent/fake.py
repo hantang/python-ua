@@ -2,13 +2,55 @@
 
 import random
 from collections.abc import Iterable
-from typing import Any, Optional, Union
+from typing import Any
 
 from fake_useragent.log import logger
 from fake_useragent.utils import BrowserUserAgentData, load
 
+DEFAULT_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0"
 
-def _ensure_iterable(*, default: Iterable[str], **kwarg: Optional[Iterable[str]]) -> list[str]:
+BROWSER_LIST = [
+    "Google",
+    "Chrome",
+    "Firefox",
+    "Edge",
+    "Opera",
+    "Safari",
+    "Android",
+    "Yandex Browser",
+    "Samsung Internet",
+    "Opera Mobile",
+    "Mobile Safari",
+    "Firefox Mobile",
+    "Firefox iOS",
+    "Chrome Mobile",
+    "Chrome Mobile iOS",
+    "Mobile Safari UI/WKWebView",
+    "Edge Mobile",
+    "DuckDuckGo Mobile",
+    "MiuiBrowser",
+    "Whale",
+    "Twitter",
+    "Facebook",
+    "Amazon Silk",
+]
+OS_LIST = [
+    "Windows",
+    "Linux",
+    "Ubuntu",
+    "Chrome OS",
+    "Mac OS X",
+    "Android",
+    "iOS",
+]
+PLATFORM_LIST = [
+    "desktop",
+    "mobile",
+    "tablet",
+]
+
+
+def _ensure_iterable(*, default: Iterable[str], **kwarg: Iterable[str] | None) -> list[str]:
     """Ensure the given value is an Iterable and convert it to a list.
 
     Args:
@@ -36,7 +78,9 @@ def _ensure_iterable(*, default: Iterable[str], **kwarg: Optional[Iterable[str]]
     try:
         return list(value)
     except TypeError as te:
-        raise TypeError(f"'{param_name}' must be an iterable of str, a single str, or None but got {type(value).__name__}.") from te
+        raise TypeError(
+            f"'{param_name}' must be an iterable of str, a single str, or None but got {type(value).__name__}."
+        ) from te
 
 
 def _ensure_float(value: Any) -> float:
@@ -109,61 +153,19 @@ class FakeUserAgent:
 
     def __init__(
         self,
-        browsers: Optional[Iterable[str]] = None,
-        os: Optional[Iterable[str]] = None,
+        browsers: Iterable[str] | None = None,
+        os: Iterable[str] | None = None,
         min_version: float = 0.0,
         min_percentage: float = 0.0,
-        platforms: Optional[Iterable[str]] = None,
-        fallback: str = (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0"
-        ),
-        safe_attrs: Optional[Iterable[str]] = None,
+        platforms: Iterable[str] | None = None,
+        fallback: str = DEFAULT_UA,
+        safe_attrs: Iterable[str] | None = None,
     ):
-        self.browsers = _ensure_iterable(
-            browsers=browsers,
-            default=[
-                "Google",
-                "Chrome",
-                "Firefox",
-                "Edge",
-                "Opera",
-                "Safari",
-                "Android",
-                "Yandex Browser",
-                "Samsung Internet",
-                "Opera Mobile",
-                "Mobile Safari",
-                "Firefox Mobile",
-                "Firefox iOS",
-                "Chrome Mobile",
-                "Chrome Mobile iOS",
-                "Mobile Safari UI/WKWebView",
-                "Edge Mobile",
-                "DuckDuckGo Mobile",
-                "MiuiBrowser",
-                "Whale",
-                "Twitter",
-                "Facebook",
-                "Amazon Silk",
-            ],
-        )
-
-        self.os = _ensure_iterable(
-            os=os,
-            default=[
-                "Windows",
-                "Linux",
-                "Ubuntu",
-                "Chrome OS",
-                "Mac OS X",
-                "Android",
-                "iOS",
-            ],
-        )
+        self.browsers = _ensure_iterable(browsers=browsers, default=BROWSER_LIST)
+        self.os = _ensure_iterable(os=os, default=OS_LIST)
         self.min_percentage = _ensure_float(min_percentage)
         self.min_version = _ensure_float(min_version)
-
-        self.platforms = _ensure_iterable(platforms=platforms, default=["desktop", "mobile", "tablet"])
+        self.platforms = _ensure_iterable(platforms=platforms, default=PLATFORM_LIST)
 
         if not isinstance(fallback, str):
             msg = f"fallback must be a str but got {type(fallback).__name__}."
@@ -183,7 +185,7 @@ class FakeUserAgent:
         # Next, load our local data file into memory (browsers.jsonl)
         self.data_browsers = load()
 
-    def getBrowser(self, browsers: Union[str, list[str]]) -> BrowserUserAgentData:
+    def getBrowser(self, browsers: str | list[str]) -> BrowserUserAgentData:
         """Get a browser user agent based on the filters.
 
         Args:
@@ -210,9 +212,8 @@ class FakeUserAgent:
             # And return the full dict
             return random.choice(filtered_browsers)  # noqa: S311
         except (KeyError, IndexError):
-            logger.warning(
-                f"Error occurred during getting browser(s): {browsers}, but was suppressed with fallback.",
-            )
+            logger.warning(f"Error occurred during getting browser(s): {browsers}, but was suppressed with fallback.")
+
             # Return fallback object
             return BrowserUserAgentData(
                 useragent=self.fallback,
@@ -227,7 +228,7 @@ class FakeUserAgent:
                 platform="Win32",
             )
 
-    def _filter_useragents(self, browsers_to_filter: Optional[Union[str, list[str]]] = None) -> list[BrowserUserAgentData]:
+    def _filter_useragents(self, browsers_to_filter: str | list[str] | None = None) -> list[BrowserUserAgentData]:
         """Filter the user agents based on filters set in the instance, and an optional browser name.
 
         User agents from the data file are filtered based on the attributes passed upon
@@ -240,7 +241,7 @@ class FakeUserAgent:
         Returns:
             list[BrowserUserAgentData]: A filtered list of user agents.
         """
-        # Filter based on browser, os, typem browser version and percentage (weight).
+        # Filter based on browser, os, browser version and percentage (weight).
 
         filtered_useragents = list(
             filter(
@@ -265,7 +266,7 @@ class FakeUserAgent:
 
         return filtered_useragents
 
-    def __getitem__(self, attr: str) -> Union[str, Any]:
+    def __getitem__(self, attr: str) -> str | Any:
         """Get a user agent by key lookup, as if it were a dictionary (i.e., `ua['random']`).
 
         Args:
@@ -277,7 +278,7 @@ class FakeUserAgent:
         """
         return self.__getattr__(attr)
 
-    def __getattr__(self, attr: Union[str, list[str]]) -> Union[str, Any]:
+    def __getattr__(self, attr: str | list[str]) -> str | Any:
         """Get a user agent string by attribute lookup.
 
         Args:

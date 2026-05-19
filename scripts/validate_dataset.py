@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Validate the bundled browser user-agent JSONL dataset."""
 
 import argparse
@@ -33,6 +32,9 @@ NUMERIC_FIELDS = ("percent", "browser_version_major_minor")
 SCHEMA_FIELDS = REQUIRED_STRING_FIELDS + OPTIONAL_STRING_FIELDS + NUMERIC_FIELDS
 VERSION_RE = re.compile(r"^\d+(?:\.\d+)*$")
 
+MIN_PERCENT = 0
+MAX_PERCENT = 100
+
 
 @dataclass(frozen=True, slots=True)
 class ValidationError:
@@ -51,13 +53,9 @@ def _is_number(value: Any) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
-def validate_record(record: Any, line_number: int) -> list[ValidationError]:
-    """Validate one parsed JSONL record."""
+def _validate_schema_fields(record: dict[str, Any], line_number: int) -> list[ValidationError]:
+    """Validate required field presence and string fields."""
     errors: list[ValidationError] = []
-
-    if not isinstance(record, dict):
-        return [ValidationError(line_number, "record must be a JSON object")]
-
     for field in SCHEMA_FIELDS:
         if field not in record:
             errors.append(ValidationError(line_number, f"missing required field: {field}"))
@@ -77,20 +75,43 @@ def validate_record(record: Any, line_number: int) -> list[ValidationError]:
         if value is not None and not isinstance(value, str):
             errors.append(ValidationError(line_number, f"{field} must be a string or null"))
 
+    return errors
+
+
+def _validate_numeric_fields(record: dict[str, Any], line_number: int) -> list[ValidationError]:
+    """Validate numeric fields and numeric ranges."""
+    errors: list[ValidationError] = []
+
     percent = record.get("percent")
     if not _is_number(percent):
         errors.append(ValidationError(line_number, "percent must be int or float"))
-    elif not 0 <= percent <= 100:
+    elif percent and not MIN_PERCENT <= percent <= MAX_PERCENT:
         errors.append(ValidationError(line_number, "percent must be between 0 and 100"))
 
     major_minor = record.get("browser_version_major_minor")
     if not _is_number(major_minor):
         errors.append(ValidationError(line_number, "browser_version_major_minor must be int or float"))
 
+    return errors
+
+
+def _validate_version_fields(record: dict[str, Any], line_number: int) -> list[ValidationError]:
+    """Validate browser version string format."""
     browser_version = record.get("browser_version")
     if isinstance(browser_version, str) and browser_version and not VERSION_RE.fullmatch(browser_version):
-        errors.append(ValidationError(line_number, "browser_version must be a dotted numeric version"))
+        return [ValidationError(line_number, "browser_version must be a dotted numeric version")]
+    return []
 
+
+def validate_record(record: Any, line_number: int) -> list[ValidationError]:
+    """Validate one parsed JSONL record."""
+    if not isinstance(record, dict):
+        return [ValidationError(line_number, "record must be a JSON object")]
+
+    errors: list[ValidationError] = []
+    errors.extend(_validate_schema_fields(record, line_number))
+    errors.extend(_validate_numeric_fields(record, line_number))
+    errors.extend(_validate_version_fields(record, line_number))
     return errors
 
 
@@ -99,22 +120,27 @@ def validate_file(path: Path) -> list[ValidationError]:
     errors: list[ValidationError] = []
     print(f"Read file = {path}")
 
-    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
-        if not line:
-            errors.append(ValidationError(line_number, "line must not be empty"))
-            continue
+    with open(path, encoding="utf-8") as f:
+        line_number = 0
+        for line in f:
+            line_number += 1
 
-        try:
-            record = json.loads(line)
-        except json.JSONDecodeError as exc:
-            errors.append(ValidationError(line_number, f"invalid JSON: {exc.msg}"))
-            continue
+            if not line:
+                errors.append(ValidationError(line_number, "line must not be empty"))
+                continue
 
-        errors.extend(validate_record(record, line_number))
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError as exc:
+                errors.append(ValidationError(line_number, f"invalid JSON: {exc.msg}"))
+                continue
 
-    if not path.read_text(encoding="utf-8").splitlines():
+            errors.extend(validate_record(record, line_number))
+
+    if line_number == 0:
         errors.append(ValidationError(0, "dataset must contain at least one record"))
 
+    print(f"Errors = {len(errors)}")
     return errors
 
 

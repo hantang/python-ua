@@ -5,7 +5,7 @@ from collections.abc import Iterator, Mapping
 from dataclasses import asdict, dataclass
 from importlib import resources
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from fake_useragent.errors import FakeUserAgentError
 from fake_useragent.log import logger
@@ -13,7 +13,7 @@ from fake_useragent.log import logger
 # PACKAGE_DATA_PATH = "fake_useragent.data"
 BROWSER_DATA_PATH = "data"
 BROWSER_DATA_FILENAME = "browsers.jsonl"
-BrowserUserAgentValue = Optional[str] | float
+BrowserUserAgentValue = str | float | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,17 +26,17 @@ class BrowserUserAgentData(Mapping[str, BrowserUserAgentValue]):
     """The usage percentage of the user agent."""
     type: str
     """The device type for this user agent (eg. mobile or desktop)."""
-    device_brand: Optional[str]
+    device_brand: str | None
     """Brand name for the device (eg. Generic_Android)."""
-    browser: Optional[str]
+    browser: str | None
     """Browser name for the user agent (eg. Chrome Mobile)."""
     browser_version: str
     """Version of the browser (eg. "100.0.4896.60")."""
     browser_version_major_minor: float
     """Major and minor version of the browser (eg. 100.0)."""
-    os: Optional[str]
+    os: str | None
     """OS name for the user agent (eg. Android)."""
-    os_version: Optional[str]
+    os_version: str | None
     """OS version (eg. 10)."""
     platform: str
     """Platform for the user agent (eg. Linux armv81)."""

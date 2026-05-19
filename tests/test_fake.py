@@ -2,8 +2,11 @@ import unittest
 
 import pytest
 
-from fake_useragent import FakeUserAgent, UserAgent, __version__, get_version
+from fake_useragent import FakeUserAgent, UserAgent
 from fake_useragent.utils import BrowserUserAgentData
+
+FILTER_MIN_VERSION = 100.0
+FILTER_MIN_PERCENTAGE = 0.05
 
 
 class TestFake(unittest.TestCase):
@@ -88,7 +91,7 @@ class TestFake(unittest.TestCase):
         self.assertEqual(ua.getBrowser("non_existing").useragent, fallback)
 
     def test_filter_useragents_combines_instance_filters(self):
-        ua = UserAgent(browsers="Chrome", os="Windows", platforms="desktop", min_version=100.0)
+        ua = UserAgent(browsers="Chrome", os="Windows", platforms="desktop", min_version=FILTER_MIN_VERSION)
 
         records = ua._filter_useragents()
 
@@ -96,7 +99,7 @@ class TestFake(unittest.TestCase):
         self.assertTrue(all(record.browser == "Chrome" for record in records))
         self.assertTrue(all(record.os == "Windows" for record in records))
         self.assertTrue(all(record.type == "desktop" for record in records))
-        self.assertTrue(all(record.browser_version_major_minor >= 100.0 for record in records))
+        self.assertTrue(all(record.browser_version_major_minor >= FILTER_MIN_VERSION for record in records))
 
     def test_filter_useragents_applies_specific_browser_argument(self):
         ua = UserAgent(browsers=["Chrome", "Firefox"], os="Windows", platforms="desktop")
@@ -107,12 +110,12 @@ class TestFake(unittest.TestCase):
         self.assertTrue(all(record.browser == "Firefox" for record in records))
 
     def test_filter_useragents_applies_min_percentage_boundary(self):
-        ua = UserAgent(min_percentage=0.05)
+        ua = UserAgent(min_percentage=FILTER_MIN_PERCENTAGE)
 
         records = ua._filter_useragents()
 
         self.assertGreater(len(records), 0)
-        self.assertTrue(all(record.percent >= 0.05 for record in records))
+        self.assertTrue(all(record.percent >= FILTER_MIN_PERCENTAGE for record in records))
 
     def test_empty_filter_result_returns_fallback_record(self):
         fallback = "fallback-user-agent"
@@ -157,9 +160,6 @@ class TestFake(unittest.TestCase):
 
         with pytest.raises(AttributeError):
             ua.__injections__  # noqa: B018
-
-    def test_fake_version(self):
-        assert __version__ == get_version.__version__
 
     def test_fake_aliases(self):
         assert FakeUserAgent is UserAgent

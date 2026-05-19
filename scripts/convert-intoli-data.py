@@ -13,7 +13,7 @@ user-agents.json.gz Example:
     "pluginsLength": 0,
     "screenHeight": 812,
     "screenWidth": 375,
-    "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2292.1719 Mobile Safari/537.36",
+    "userAgent": "Mozilla/5.0 (...) Chrome/41.0.2292.1719 Mobile Safari/537.36",
     "vendor": "Google Inc.",
     "viewportHeight": 812,
     "viewportWidth": 375,
@@ -83,7 +83,7 @@ def read_and_extract(data_file: str | Path) -> list[SourceItem]:
             raw_data = json.loads(contents)
     elif data_path.suffix == ".json":
         print(f"Reading json data from {data_file}")
-        with open(data_file, "r", encoding="utf-8") as f:
+        with open(data_file, encoding="utf-8") as f:
             raw_data = json.load(f)
 
     return [SourceItem.from_mapping(item) for item in raw_data]
@@ -169,7 +169,8 @@ def convert_useragents_formats(
     return results
 
 
-def main(data_file: str | Path, save_file: str | Path, limit: int = 0, workers: int = 0):
+def main(data_file: str | Path, save_file: str | Path, limit: int = 0, workers: int = 0) -> None:
+    """Convert source browser records and write the generated JSONL dataset."""
     data = read_and_extract(data_file)
     if not data:
         return
