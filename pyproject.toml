@@ -1,6 +1,6 @@
 [project]
 name = "forge-useragent"
-version = "3.0.0"
+version = "3.0.1"
 license = "Apache-2.0"
 description = "Up-to-date simple user-agent faker with real world database"
 readme = "README.md"
