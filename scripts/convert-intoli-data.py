@@ -211,7 +211,7 @@ def main(data_file: str | Path, save_file: str | Path, limit: int = 0, workers: 
         return
 
     output = [json.dumps(entry.as_dict()) for entry in jsonl_converted]
-    update_archive(output, save_file)
+    # update_archive(output, save_file)
 
     print(f"Writing data to {save_file}")
     save_parent = Path(save_file).parent
