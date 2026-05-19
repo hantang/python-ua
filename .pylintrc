@@ -1,2 +1,5 @@
+[MAIN]
+max-line-length=142
+
 [MESSAGES CONTROL]
-disable=missing-class-docstring,missing-function-docstring
+disable=missing-class-docstring,missing-function-docstring,W1203,C0103

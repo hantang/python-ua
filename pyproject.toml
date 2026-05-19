@@ -45,10 +45,8 @@ build-backend = "uv_build"
 
 [dependency-groups]
 converter = [
-  "requests>=2.32.4",
-  "ua-parser>=1.0.0",
-  "ua-parser-builtins>=0.18.0.post1",
-  "ua-parser-rs>=0.1.2",
+  # "requests>=2.32.4",
+  "ua-parser[regex]>=1.0.2",
 ]
 dev = [
   "mypy>=1.18.2",
@@ -64,34 +62,3 @@ module-name = "fake_useragent"
 [tool.ruff]
 target-version = "py310"
 line-length = 142
-
-lint.select = [
-  "B",
-  "C4",
-  "C9",
-  "D",   # Check compliance with Python docstring conventions.
-  "E",
-  "F",
-  "I",
-  "PL",
-  "S",
-  "SIM",
-  "W",
-  "YTT",
-]
-lint.ignore = [
-  "B904",
-  "C408",
-  "D107",    # Allow no docstring in __init__, we document it in the class docstring.
-  "PLW2901",
-  "SIM105",
-  "SIM108",
-]
-lint.per-file-ignores."docs/**/*" = ["D"]
-lint.per-file-ignores."src/fake_useragent/__init__.py" = ["F401"]
-lint.per-file-ignores."tests/**/*" = ["D", "S", "SIM", "UP015"]
-lint.isort.known-first-party = ["fake_useragent"]
-lint.mccabe.max-complexity = 13
-lint.pydocstyle.convention = "google"
-lint.pylint.max-args = 7
-lint.pylint.max-branches = 13
