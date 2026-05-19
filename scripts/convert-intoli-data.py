@@ -132,9 +132,7 @@ def process_item(item: SourceItem) -> BrowserUserAgentData | None:
     )
 
 
-def convert_useragents_formats(
-    data_list: Iterable[SourceItem], *, max_workers: int = 0, step: int = 1000
-) -> list[BrowserUserAgentData]:
+def convert_useragents_formats(data_list: Iterable[SourceItem], *, max_workers: int = 0, step: int = 1000) -> list[BrowserUserAgentData]:
     """Convert source items to BrowserUserAgentData records in parallel.
 
     Args:

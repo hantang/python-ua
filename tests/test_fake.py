@@ -8,6 +8,7 @@ from fake_useragent.utils import BrowserUserAgentData
 
 FILTER_MIN_VERSION = 100.0
 FILTER_MIN_PERCENTAGE = 0.05
+FALLBACK_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0"
 
 
 class TestFake(unittest.TestCase):
@@ -77,14 +78,14 @@ class TestFake(unittest.TestCase):
         assert isinstance(ua.data_browsers, list)
 
     def test_fake_fallback(self):
-        fallback = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0"
+        fallback = FALLBACK_UA
 
         ua = UserAgent()
         self.assertEqual(ua.non_existing, fallback)
         self.assertEqual(ua["non_existing"], fallback)
 
     def test_fake_fallback_dictionary(self):
-        fallback = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0"
+        fallback = FALLBACK_UA
 
         ua = UserAgent()
         self.assertIsInstance(ua.get_browser("non_existing"), BrowserUserAgentData)

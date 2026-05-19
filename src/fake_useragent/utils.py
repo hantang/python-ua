@@ -78,10 +78,10 @@ class BrowserUserAgentData(Mapping[str, BrowserUserAgentValue]):
 
 
 def find_browser_json_path() -> Path:
-    """Find the path to the browsers.json file.
+    """Find the path to the browsers.jsonl file.
 
     Returns:
-        Path: Path to the browsers.json file.
+        Path: Path to the browsers.jsonl file.
 
     Raises:
         FakeUserAgentError: If unable to find the file.
@@ -96,7 +96,7 @@ def find_browser_json_path() -> Path:
 
 
 def load() -> list[BrowserUserAgentData]:
-    """Load the included `browser.json` file into memory.
+    """Load the included `browser.jsonl` file into memory.
 
     Raises:
         FakeUserAgentError: If unable to load or parse the data.
@@ -113,7 +113,7 @@ def load() -> list[BrowserUserAgentData]:
                 value = json.loads(line)
                 data.append(BrowserUserAgentData.from_mapping(value))
     except Exception as exc:
-        raise FakeUserAgentError("Failed to load or parse browsers.json") from exc
+        raise FakeUserAgentError(f"Failed to load or parse {BROWSER_DATA_FILENAME}") from exc
 
     if not data:
         raise FakeUserAgentError("Data list is empty", data)

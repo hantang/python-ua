@@ -52,7 +52,7 @@ BROWSER_ALIASES: Final[dict[str, tuple[str, ...]]] = {
     "chrome": ("Chrome", "Chrome Mobile", "Chrome Mobile iOS"),
     "firefox": ("Firefox", "Firefox Mobile", "Firefox iOS"),
     "safari": ("Safari", "Mobile Safari"),
-    "opera": ("Opera", "Opera Mobile"), # Opera Mobile
+    "opera": ("Opera", "Opera Mobile"),  # Opera Mobile
     "google": ("Google",),
     "edge": ("Edge", "Edge Mobile"),
     "others": (
@@ -107,9 +107,7 @@ def _ensure_iterable(*, default: Iterable[str], **kwarg: Iterable[str] | None) -
     try:
         return list(value)
     except TypeError as te:
-        raise TypeError(
-            f"'{param_name}' must be an iterable of str, a single str, or None but got {type(value).__name__}."
-        ) from te
+        raise TypeError(f"'{param_name}' must be an iterable of str, a single str, or None but got {type(value).__name__}.") from te
 
 
 def _ensure_float(value: Any) -> float:
@@ -351,7 +349,6 @@ class FakeUserAgent:
     def others(self) -> str:
         """Get a random Edge user agent."""
         return self._get_browser_useragent(BROWSER_ALIASES["others"])
-
 
     @property
     def random(self) -> str:
