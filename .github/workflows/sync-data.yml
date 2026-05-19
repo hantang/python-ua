@@ -2,8 +2,8 @@ name: Update Bundled User Agents
 
 on:
   schedule:
-    - cron: '2 4 2 * 0'  # Run monthly (2nd day of the month) on Sunday at 4:02 at night
-  workflow_dispatch:  # Allow manual trigger
+    - cron: "2 4 * * 0" # Sunday at 4:02
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -12,32 +12,61 @@ permissions:
 jobs:
   update-useragents:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # USER: ${{ github.repository_owner }}
+      # REPO: ${{ github.event.repository.name }}
+      REMOTE_REPO: "intoli/user-agents"
+      REPO_DIR: "temp"
 
     steps:
-    - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.13'
+      - name: Checkout data repo
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.REMOTE_REPO }}
+          path: ${{ env.REPO_DIR }}
+          fetch-depth: 1
+          ref: ${{ github.ref }}
 
-    - name: Install uv
-      uses: astral-sh/setup-uv@v8.1.0
-      with:
-        enable-cache: true
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
 
-    - name: Process source UA file and produce our JSONL
-      run: uv run --group converter python scripts/ua_convert.py --download
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.1.0
+        with:
+          enable-cache: true
 
-    - name: Create Pull Request
-      id: pr
-      uses: peter-evans/create-pull-request@v8
-      with:
-        commit-message: Update bundled user agents
-        branch: automated/ua-update
-        title: Update bundled user agents file
-        body: |
-          This PR updates the bundled user agents file. 
-          Thanks Intoli for the licence that permits us to use their data! 
-          Check their work at [`user-agents`](https://github.com/intoli/user-agents).
-        labels: ua-file
+      - name: Process source UA file and produce our JSONL
+        run: uv run --group converter python scripts/convert-intoli-data.py --download
+
+      - name: Validate generated user-agent dataset
+        run: uv run python scripts/validate_dataset.py
+
+      # - name: Create Pull Request
+      #   id: pr
+      #   uses: peter-evans/create-pull-request@v8
+      #   with:
+      #     commit-message: Update bundled user agents
+      #     branch: automated/ua-update
+      #     title: Update bundled user agents file
+      #     body: |
+      #       This PR updates the bundled user agents file. 
+      #       Thanks Intoli for the licence that permits us to use their data! 
+      #       Check their work at [`user-agents`](https://github.com/intoli/user-agents).
+      #     labels: ua-file
+
+      - name: Git auto commit
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          commit_message: Automated update browsers.jsonl
+          # commit_options: '--no-verify --signoff'
+          # push_options: "--force"
+          file_pattern: "*.jsonl"

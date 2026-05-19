@@ -8,6 +8,10 @@ on:
     #   - "*"
     paths:
       - "**/*.py"
+      - ".github/workflows/action.yml"
+      # - "src/fake_useragent/data/browsers.jsonl"
+      # - "pyproject.toml"
+      # - "uv.lock"
   pull_request:
     branches:
       - main
@@ -56,13 +60,16 @@ jobs:
       - name: Validate package metadata
         run: uvx --with tomli validate-pyproject pyproject.toml
 
+      # - name: Validate bundled user-agent dataset
+      #   run: uv run python scripts/validate_dataset.py
+
       - name: Run tests
         run: uv run pytest --cov=src --cov-report=html
 
-      - name: Upload code coverage HTML
-        uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: code-coverage-${{ matrix.python-version }}
-          path: htmlcov/
-          if-no-files-found: ignore
+      # - name: Upload code coverage HTML
+      #   uses: actions/upload-artifact@v7
+      #   if: always()
+      #   with:
+      #     name: code-coverage-${{ matrix.python-version }}
+      #     path: htmlcov/
+      #     if-no-files-found: ignore
