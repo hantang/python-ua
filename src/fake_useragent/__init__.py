@@ -13,7 +13,7 @@ def get_version(pkg_name: str, default="0.0.1") -> str:
         return default
 
 
-__version__ = get_version("fake-useragent")
+__version__ = get_version("forge-useragent")
 
 __all__ = [
     "FakeUserAgent",

@@ -39,6 +39,7 @@ from fake_useragent.utils import BrowserUserAgentData, find_browser_json_path
 
 # DEFAULT_URL = "https://raw.githubusercontent.com/intoli/user-agents/main/src/user-agents.json.gz"
 DEFAULT_FILE = "temp/src/user-agents.json.gz"
+ARCHIVE_FILE = "archives/browsers.jsonl"
 
 
 @dataclass(slots=True, frozen=True)
@@ -169,8 +170,34 @@ def convert_useragents_formats(
     return results
 
 
+def update_archive(data: list, jsonl_file: str | Path):
+    archive_path = Path(ARCHIVE_FILE)
+    archive_data = []
+    if Path(jsonl_file).exists():
+        with open(jsonl_file, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and line not in data:
+                    archive_data.append(line)
+        print(f"archive data = {len(archive_data)}")
+    if not archive_data:
+        return
+
+    if archive_path.exists():
+        for line in f:
+            line = line.strip()
+            if line:
+                archive_data.append(line)
+    archive_data = sorted(set(archive_data))
+    print(f"total archive data = {len(archive_data)}")
+    archive_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(archive_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(archive_data) + "\n")
+
+
 def main(data_file: str | Path, save_file: str | Path, limit: int = 0, workers: int = 0) -> None:
     """Convert source browser records and write the generated JSONL dataset."""
+
     data = read_and_extract(data_file)
     if not data:
         return
@@ -185,15 +212,18 @@ def main(data_file: str | Path, save_file: str | Path, limit: int = 0, workers: 
     if not jsonl_converted:
         return
 
+    output = [json.dumps(entry.as_dict()) for entry in jsonl_converted]
+    update_archive(output, save_file)
+
+    print(f"Writing data to {save_file}")
     save_parent = Path(save_file).parent
     if not save_parent.exists():
         print("Create save dir = {save_parent}")
         save_parent.mkdir(parents=True)
 
-    print(f"Writing data to {save_file}")
     with open(save_file, "w", encoding="utf-8") as fw:
-        for entry in jsonl_converted:
-            fw.write(json.dumps(entry.as_dict()) + "\n")
+        for entry in output:
+            fw.write(entry + "\n")
 
     print("Done!")
 
