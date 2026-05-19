@@ -3,6 +3,7 @@ import unittest
 import pytest
 
 from fake_useragent import FakeUserAgent, UserAgent, __version__, get_version
+from fake_useragent.utils import BrowserUserAgentData
 
 
 class TestFake(unittest.TestCase):
@@ -31,19 +32,19 @@ class TestFake(unittest.TestCase):
         self.assertIsInstance(ua.random, str)
 
         self.assertTrue(ua.getChrome)
-        self.assertIsInstance(ua.getChrome, dict)
+        self.assertIsInstance(ua.getChrome, BrowserUserAgentData)
         self.assertTrue(ua.getGoogle)
-        self.assertIsInstance(ua.getGoogle, dict)
+        self.assertIsInstance(ua.getGoogle, BrowserUserAgentData)
         self.assertTrue(ua.getFirefox)
-        self.assertIsInstance(ua.getFirefox, dict)
+        self.assertIsInstance(ua.getFirefox, BrowserUserAgentData)
         self.assertTrue(ua.getEdge)
-        self.assertIsInstance(ua.getEdge, dict)
+        self.assertIsInstance(ua.getEdge, BrowserUserAgentData)
         self.assertTrue(ua.getSafari)
-        self.assertIsInstance(ua.getSafari, dict)
+        self.assertIsInstance(ua.getSafari, BrowserUserAgentData)
         self.assertTrue(ua.getOpera)
-        self.assertIsInstance(ua.getOpera, dict)
+        self.assertIsInstance(ua.getOpera, BrowserUserAgentData)
         self.assertTrue(ua.getRandom)
-        self.assertIsInstance(ua.getRandom, dict)
+        self.assertIsInstance(ua.getRandom, BrowserUserAgentData)
 
     def test_fake_probe_user_agent_browsers(self):
         ua = UserAgent()
@@ -83,8 +84,45 @@ class TestFake(unittest.TestCase):
         )
 
         ua = UserAgent()
-        self.assertIsInstance(ua.getBrowser("non_existing"), dict)
-        self.assertEqual(ua.getBrowser("non_existing").get("useragent"), fallback)
+        self.assertIsInstance(ua.getBrowser("non_existing"), BrowserUserAgentData)
+        self.assertEqual(ua.getBrowser("non_existing").useragent, fallback)
+
+    def test_filter_useragents_combines_instance_filters(self):
+        ua = UserAgent(browsers="Chrome", os="Windows", platforms="desktop", min_version=100.0)
+
+        records = ua._filter_useragents()
+
+        self.assertGreater(len(records), 0)
+        self.assertTrue(all(record.browser == "Chrome" for record in records))
+        self.assertTrue(all(record.os == "Windows" for record in records))
+        self.assertTrue(all(record.type == "desktop" for record in records))
+        self.assertTrue(all(record.browser_version_major_minor >= 100.0 for record in records))
+
+    def test_filter_useragents_applies_specific_browser_argument(self):
+        ua = UserAgent(browsers=["Chrome", "Firefox"], os="Windows", platforms="desktop")
+
+        records = ua._filter_useragents(browsers_to_filter="Firefox")
+
+        self.assertGreater(len(records), 0)
+        self.assertTrue(all(record.browser == "Firefox" for record in records))
+
+    def test_filter_useragents_applies_min_percentage_boundary(self):
+        ua = UserAgent(min_percentage=0.05)
+
+        records = ua._filter_useragents()
+
+        self.assertGreater(len(records), 0)
+        self.assertTrue(all(record.percent >= 0.05 for record in records))
+
+    def test_empty_filter_result_returns_fallback_record(self):
+        fallback = "fallback-user-agent"
+        ua = UserAgent(min_percentage=101.0, fallback=fallback)
+
+        record = ua.getRandom
+
+        self.assertIsInstance(record, BrowserUserAgentData)
+        self.assertEqual(record.useragent, fallback)
+        self.assertEqual(ua.random, fallback)
 
     def test_fake_fallback_str_types(self):
         with pytest.raises(TypeError):

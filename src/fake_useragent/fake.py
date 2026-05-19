@@ -214,18 +214,18 @@ class FakeUserAgent:
                 f"Error occurred during getting browser(s): {browsers}, but was suppressed with fallback.",
             )
             # Return fallback object
-            return {
-                "useragent": self.fallback,
-                "percent": 100.0,
-                "type": "desktop",
-                "device_brand": None,
-                "browser": "Edge",
-                "browser_version": "122.0.0.0",
-                "browser_version_major_minor": 122.0,
-                "os": "win32",
-                "os_version": "10",
-                "platform": "Win32",
-            }
+            return BrowserUserAgentData(
+                useragent=self.fallback,
+                percent=100.0,
+                type="desktop",
+                device_brand=None,
+                browser="Edge",
+                browser_version="122.0.0.0",
+                browser_version_major_minor=122.0,
+                os="win32",
+                os_version="10",
+                platform="Win32",
+            )
 
     def _filter_useragents(self, browsers_to_filter: Optional[Union[str, list[str]]] = None) -> list[BrowserUserAgentData]:
         """Filter the user agents based on filters set in the instance, and an optional browser name.
@@ -245,11 +245,11 @@ class FakeUserAgent:
         filtered_useragents = list(
             filter(
                 lambda x: (
-                    x["browser"] in self.browsers
-                    and x["os"] in self.os
-                    and x["type"] in self.platforms  # We check platform on type here (I know it's confusing)
-                    and x["browser_version_major_minor"] >= self.min_version
-                    and x["percent"] >= self.min_percentage
+                    x.browser in self.browsers
+                    and x.os in self.os
+                    and x.type in self.platforms  # We check platform on type here (I know it's confusing)
+                    and x.browser_version_major_minor >= self.min_version
+                    and x.percent >= self.min_percentage
                 ),
                 self.data_browsers,
             )
@@ -261,7 +261,7 @@ class FakeUserAgent:
             if isinstance(browsers_to_filter, str):
                 browsers_to_filter = [browsers_to_filter]
 
-            filtered_useragents = list(filter(lambda x: x["browser"] in browsers_to_filter, filtered_useragents))
+            filtered_useragents = list(filter(lambda x: x.browser in browsers_to_filter, filtered_useragents))
 
         return filtered_useragents
 
@@ -296,7 +296,7 @@ class FakeUserAgent:
                 if a in self.safe_attrs:
                     return super(UserAgent, self).__getattribute__(a)
 
-        return self.getBrowser(attr)["useragent"]
+        return self.getBrowser(attr).useragent
 
     @property
     def chrome(self) -> str:
